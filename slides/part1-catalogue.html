@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data Visualisation with R Workshop Part 1</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Emi Tanaka" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+    <link href="libs/font-awesome-animation-1.0/font-awesome-animation-emi.css" rel="stylesheet" />
+    <script src="libs/fontawesome-5.0.13/js/fontawesome-all.min.js"></script>
+    <link rel="stylesheet" href="assets/animate.css" type="text/css" />
+    <link rel="stylesheet" href="assets/styles.css" type="text/css" />
+    <link rel="stylesheet" href="assets/fira-code.css" type="text/css" />
+    <link rel="stylesheet" href="assets/monash-brand.css" type="text/css" />
+    <link rel="stylesheet" href="assets/boxes.css" type="text/css" />
+    <link rel="stylesheet" href="assets/custom.css" type="text/css" />
+    <link rel="stylesheet" href="assets/tachyons-addon.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+class: monash-bg-blue center middle hide-slide-number 
+
+
+
+&lt;div class="bg-black white"  style="width:45%;right:0;bottom:0;padding-left:5px;border: solid 4px white;margin: auto;"&gt;
+&lt;i class="fas fa-exclamation-circle"&gt;&lt;/i&gt; These slides are viewed best by Chrome and occasionally need to be refreshed if elements did not load properly. See here for &lt;a href=part1-catalogue.pdf&gt;PDF &lt;i class="fas fa-file-pdf"&gt;&lt;/i&gt;&lt;/a&gt;. 
+&lt;/div&gt;
+
+&lt;br&gt;
+
+.white[Push the **right arrow key** to see the next slide.]
+
+
+---
+
+count: false
+background-image: url(images/bg6.jpg)
+background-size: cover
+class: hide-slide-number title-slide
+
+
+&lt;div class="grid-row" style="grid: 1fr / 2fr;"&gt;
+
+.item.center[
+
+# &lt;span style="text-shadow: 2px 2px 30px white;"&gt;Data Visualisation with R
+Workshop Part 1
+&lt;/span&gt;
+
+&lt;!-- ## &lt;span style="color:;text-shadow: 2px 2px 30px black;"&gt;Catalogue&lt;/span&gt; --&gt;
+
+]
+
+.center.shade_black.animated.bounceInUp.slower[
+&lt;br&gt;&lt;br&gt;
+## Catalogue
+
+&lt;br&gt;
+
+Presented by Emi Tanaka
+
+Department of Econometrics and Business Statistics
+
+&lt;img src="images/monash-one-line-reversed.png" style="width:500px"&gt;&lt;br&gt;
+<span>&lt;i class="fas  fa-envelope faa-float animated "&gt;&lt;/i&gt;</span>  emi.tanaka@monash.edu
+<span>&lt;i class="fab  fa-twitter faa-float animated faa-fast "&gt;&lt;/i&gt;</span>  @statsgen
+
+.bottom_abs.width100.bg-black[
+21st Feb 2022 @ methods@manchester | Zoom
+]
+
+
+]
+
+&lt;/div&gt;
+
+
+
+
+
+
+
+---
+
+class: transition
+name: catalogue
+
+
+
+# Catalogue
+
+
+
+&lt;style&gt;
+.catalogue { 
+  margin: 0!important; 
+  width: 13%!important;
+  margin-right: 2%!important;
+}
+&lt;/style&gt;
+
+.ma3[
+
+&lt;a href="#histogram"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-1.png"/&gt;&lt;/a&gt;&lt;a href="#density"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-2.png"/&gt;&lt;/a&gt;&lt;a href="#boxplot"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-3.png"/&gt;&lt;/a&gt;&lt;a href="#violin"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-4.png"/&gt;&lt;/a&gt;&lt;a href="#dotplot"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-5.png"/&gt;&lt;/a&gt;&lt;a href="#barplot"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-6.png"/&gt;&lt;/a&gt;&lt;a href="#stacked"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-7.png"/&gt;&lt;/a&gt;&lt;a href="#grouped"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-8.png"/&gt;&lt;/a&gt;&lt;a href="#fill"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-9.png"/&gt;&lt;/a&gt;&lt;a href="#scatter"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-10.png"/&gt;&lt;/a&gt;&lt;a href="#hex"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-11.png"/&gt;&lt;/a&gt;&lt;a href="#2D"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-12.png"/&gt;&lt;/a&gt;&lt;a href="#line"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-13.png"/&gt;&lt;/a&gt;&lt;a href="#tile"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-14.png"/&gt;&lt;/a&gt;&lt;a href="#map"&gt;&lt;img class="catalogue" src="images/part1-catalogue/catalogue-15.png"/&gt;&lt;/a&gt;
+
+
+]
+
+
+???
+
+* Distribution of a single _continuous_ variable can be studied with **histogram**, **density or frequency plot**, **boxplot**, **violin plot** or **dot plot**. 
+* If you have a discrete or categorical variable, you may like to study this using a **barplot** (or sometimes called barchart). 
+* We'll go through how to create these layers in `ggplot2` next. 
+
+---
+
+# Illustrative data 💰 Wages
+
+* Let's look at a survey of average hourly earnings in United States where each observation is an individual.
+
+
+```r
+data(CPSch3, package = "Ecdat")
+str(CPSch3)
+```
+
+```
+## 'data.frame':	11130 obs. of  3 variables:
+##  $ year: int  1992 1992 1992 1992 1992 1992 1992 1992 1992 1992 ...
+##  $ ahe : num  13 11.6 17.4 10.1 16.8 ...
+##  $ sex : Factor w/ 2 levels "male","female": 1 1 1 2 1 2 2 1 1 1 ...
+```
+
+???
+
+* Let's use a data to illustrate the different layers in `ggplot2`.
+* This data contains: 
+  * `year` = the survey year
+  * `ahe` = the average hourly earnings
+  * `sex` = the sex (male or female)
+
+
+---
+
+layout: true
+
+
+[.tag.absolute.right-1.bottom-1[&lt;i class="fas fa-caret-right"&gt;&lt;/i&gt; Back to catalogue]](#catalogue)
+
+
+
+---
+
+name: histogram
+
+# A histogram with `geom_histogram()`
+
+
+```r
+ggplot(data = CPSch3, 
+       mapping = aes(x = ahe)) +
+* geom_histogram() +
+  labs(x = "Average hourly earnings (US$)")
+```
+
+&lt;img src="images/part1-catalogue/geom-histogram-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* By default `ggplot2` uses 30 bins (`bins = 30`) when drawing histograms. 
+* It is often a good idea to try different number of bins (`bins`) or different bin widths (`bindwidth`) to see how the **shape** of the histogram changes. 
+* Here we can see that the distribution for the average hourly earnings are slightly right skewed.
+* The mode average hourly earning looks like it's about US$14. 
+* To find more about how to change parameters of the layer, have a look at the corresponding documentation (`?geom_histogram`).
+
+
+---
+
+# Layer data
+
+
+```r
+g &lt;- ggplot(data = CPSch3, 
+       mapping = aes(x = ahe)) +
+  geom_histogram() 
+
+*layer_data(g, 1)
+```
+.f4[
+
+```
+##       y count         x       xmin      xmax      density      ncount    ndensity flipped_aes PANEL
+## 1    19    19  1.734720  0.8673601  2.602080 0.0009840768 0.014011799 0.014011799       FALSE     1
+## 2    91    91  3.469440  2.6020802  4.336800 0.0047132101 0.067109145 0.067109145       FALSE     1
+## 3   255   255  5.204160  4.3368004  6.071521 0.0132073470 0.188053097 0.188053097       FALSE     1
+## 4   514   514  6.938881  6.0715206  7.806241 0.0266218681 0.379056047 0.379056047       FALSE     1
+## 5   760   760  8.673601  7.8062407  9.540961 0.0393630735 0.560471976 0.560471976       FALSE     1
+## 6  1143  1143 10.408321  9.5409609 11.275681 0.0591999908 0.842920354 0.842920354       FALSE     1
+## 7  1356  1356 12.143041 11.2756811 13.010401 0.0702320101 1.000000000 1.000000000       FALSE     1
+## 8  1232  1232 13.877761 13.0104012 14.745121 0.0638096139 0.908554572 0.908554572       FALSE     1
+## 9  1137  1137 15.612481 14.7451214 16.479842 0.0588892297 0.838495575 0.838495575       FALSE     1
+## 10  941   941 17.347202 16.4798416 18.214562 0.0487377002 0.693952802 0.693952802       FALSE     1
+## 11  798   798 19.081922 18.2145617 19.949282 0.0413312272 0.588495575 0.588495575       FALSE     1
+## 12  749   749 20.816642 19.9492819 21.684002 0.0387933448 0.552359882 0.552359882       FALSE     1
+## 13  497   497 22.551362 21.6840021 23.418722 0.0257413783 0.366519174 0.366519174       FALSE     1
+## 14  428   428 24.286082 23.4187222 25.153442 0.0221676256 0.315634218 0.315634218       FALSE     1
+## 15  279   279 26.020802 25.1534424 26.888163 0.0144503915 0.205752212 0.205752212       FALSE     1
+## 16  249   249 27.755523 26.8881625 28.622883 0.0128965859 0.183628319 0.183628319       FALSE     1
+## 17  186   186 29.490243 28.6228827 30.357603 0.0096335943 0.137168142 0.137168142       FALSE     1
+## 18  148   148 31.224963 30.3576029 32.092323 0.0076654406 0.109144543 0.109144543       FALSE     1
+## 19  101   101 32.959683 32.0923230 33.827043 0.0052311453 0.074483776 0.074483776       FALSE     1
+## 20   66    66 34.694403 33.8270432 35.561763 0.0034183722 0.048672566 0.048672566       FALSE     1
+## 21   40    40 36.429123 35.5617634 37.296484 0.0020717407 0.029498525 0.029498525       FALSE     1
+## 22   48    48 38.163844 37.2964835 39.031204 0.0024860889 0.035398230 0.035398230       FALSE     1
+## 23   29    29 39.898564 39.0312037 40.765924 0.0015020120 0.021386431 0.021386431       FALSE     1
+## 24   20    20 41.633284 40.7659239 42.500644 0.0010358704 0.014749263 0.014749263       FALSE     1
+## 25   15    15 43.368004 42.5006440 44.235364 0.0007769028 0.011061947 0.011061947       FALSE     1
+## 26   13    13 45.102724 44.2353642 45.970084 0.0006733157 0.009587021 0.009587021       FALSE     1
+## 27    6     6 46.837444 45.9700844 47.704805 0.0003107611 0.004424779 0.004424779       FALSE     1
+## 28    3     3 48.572165 47.7048045 49.439525 0.0001553806 0.002212389 0.002212389       FALSE     1
+## 29    5     5 50.306885 49.4395247 51.174245 0.0002589676 0.003687316 0.003687316       FALSE     1
+## 30    2     2 52.041605 51.1742448 52.908965 0.0001035870 0.001474926 0.001474926       FALSE     1
+##    group ymin ymax colour   fill size linetype alpha
+## 1     -1    0   19     NA grey35  0.5        1    NA
+## 2     -1    0   91     NA grey35  0.5        1    NA
+## 3     -1    0  255     NA grey35  0.5        1    NA
+## 4     -1    0  514     NA grey35  0.5        1    NA
+## 5     -1    0  760     NA grey35  0.5        1    NA
+## 6     -1    0 1143     NA grey35  0.5        1    NA
+## 7     -1    0 1356     NA grey35  0.5        1    NA
+## 8     -1    0 1232     NA grey35  0.5        1    NA
+## 9     -1    0 1137     NA grey35  0.5        1    NA
+## 10    -1    0  941     NA grey35  0.5        1    NA
+## 11    -1    0  798     NA grey35  0.5        1    NA
+## 12    -1    0  749     NA grey35  0.5        1    NA
+## 13    -1    0  497     NA grey35  0.5        1    NA
+## 14    -1    0  428     NA grey35  0.5        1    NA
+## 15    -1    0  279     NA grey35  0.5        1    NA
+## 16    -1    0  249     NA grey35  0.5        1    NA
+## 17    -1    0  186     NA grey35  0.5        1    NA
+## 18    -1    0  148     NA grey35  0.5        1    NA
+## 19    -1    0  101     NA grey35  0.5        1    NA
+## 20    -1    0   66     NA grey35  0.5        1    NA
+## 21    -1    0   40     NA grey35  0.5        1    NA
+## 22    -1    0   48     NA grey35  0.5        1    NA
+## 23    -1    0   29     NA grey35  0.5        1    NA
+## 24    -1    0   20     NA grey35  0.5        1    NA
+## 25    -1    0   15     NA grey35  0.5        1    NA
+## 26    -1    0   13     NA grey35  0.5        1    NA
+## 27    -1    0    6     NA grey35  0.5        1    NA
+## 28    -1    0    3     NA grey35  0.5        1    NA
+## 29    -1    0    5     NA grey35  0.5        1    NA
+## 30    -1    0    2     NA grey35  0.5        1    NA
+```
+]
+
+
+???
+
+* A histogram by default shows the **count** on the y-axis. 
+* `ggplot2` calculates other useful statistics as well (seen using `layer_data`) and sometimes you want to use these instead. 
+
+---
+
+# Layer data
+
+
+```r
+ggplot(data = CPSch3, 
+       mapping = aes(x = ahe)) +
+  geom_histogram(aes(y = after_stat(density))) 
+```
+
+&lt;img src="images/part1-catalogue/geom-histogram-density-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* In this plot, the y-axis is showing density intead of count. 
+* This is signalled by using `y = after_stat(density)`. 
+* This syntax is equivalent to `y = stat(density)` or `y = ..density..`, which was the old syntax to refer to computed statistics. 
+
+---
+
+name: density
+
+# A density plot with `geom_density()`
+
+
+```r
+ggplot(data = CPSch3, 
+       mapping = aes(x = ahe)) +
+* geom_density() +
+  labs(x = "Average hourly earnings (US$)")
+```
+
+&lt;img src="images/part1-catalogue/geom-density-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* A density plot is like a histogram where it reveals the distribution of a (continuous) numerical variable. 
+* The y-axis is showing the density, which is esimated using a particular kernel function. 
+* The estimated density can oversmooth or have problems in the tails -- so don't only rely on density plots to tell you the full picture of the data. 
+
+
+---
+
+
+# A frequency polygon with `geom_freqpoly()`
+
+
+```r
+ggplot(data = CPSch3, 
+       mapping = aes(x = ahe)) +
+* geom_freqpoly() +
+  labs(x = "Average hourly earnings (US$)")
+```
+
+&lt;img src="images/part1-catalogue/geom-freqpoly-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* The default `geom_freqpoly` is showing the same statistic (`stat = "bin"`) as the default `geom_histogram` except one is using a bar (`geom = "bar"`) and the other is using a line (`geom = "path"`). 
+
+---
+
+name: boxplot
+
+# A boxplot with `geom_boxplot()`
+
+
+```r
+ggplot(data = CPSch3, 
+       mapping = aes(x = ahe)) +
+* geom_boxplot() +
+  labs(x = "Average hourly earnings (US$)")
+```
+
+&lt;img src="images/part1-catalogue/geom-boxplot-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* A boxplot depicts graphically the five number summary: minimum, first quartile, median, third quartile and maximum. 
+* `geom_boxplot` is also useful in comparing distributions of multiple numerical variables, like below, where each variable corresponds to one boxplot. 
+
+&lt;img src="images/part1-catalogue/boxplot-multiple-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+name: violin
+
+# A violin plot with `geom_violin()`
+
+
+```r
+ggplot(data = CPSch3, 
+       mapping = aes(x = ahe, y = "")) +
+* geom_violin() +
+  labs(x = "Average hourly earnings (US$)")
+```
+
+&lt;img src="images/part1-catalogue/geom-violin-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+
+* A dummy is required for `y` here!
+* A violin plot depicts a density estimate of a continous variable.
+
+---
+
+name: dotplot
+
+# A dotplot with `geom_dotplot()`
+
+
+```r
+ggplot(data = dplyr::sample_n(CPSch3, 200), 
+       mapping = aes(x = ahe)) +
+* geom_dotplot() +
+  labs(x = "Average hourly earnings (US$)")
+```
+
+&lt;img src="images/part1-catalogue/geom-dotplot-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* A dotplot works best for small number of observations so this plot is based on 200 random samples of the data.
+
+
+---
+
+name: barplot
+
+# A barplot with `geom_bar()` with categorical variables
+
+
+```r
+ggplot(data = CPSch3, 
+       mapping = aes(x = sex)) +
+* geom_bar()
+```
+
+&lt;img src="images/part1-catalogue/geom-bar-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* If you have a categorical variable, then you usually want to study the frequency of its categories. 
+* Notice here that the `stat = "count"` is computing the frequencies for each category for you.  
+
+---
+
+# A barplot with `geom_bar()` with discrete variables
+
+
+```r
+ggplot(data = filter(CPSch3, year!=1994), 
+       mapping = aes(x = year)) +
+* geom_bar()
+```
+
+&lt;img src="images/part1-catalogue/geom-bar2A-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* If you supply a numerical variable, you can see now that the x-axis scale is continuous. 
+* The years are 2 years apart -- I filtered out 1994 on purpose so that it's easier to see the distance between bars are determined by the numerical value. 
+* If you want to study each level in a discrete variable, then you may want to convert the discrete variable to a factor instead `x = factor(year)`. 
+
+&lt;img src="images/part1-catalogue/geom-bar2B-1.png" style="display: block; margin: auto;" /&gt;
+
+* When the variable is a factor or character, the distances between the bars are equal and the labels correspond to that particular level.
+
+
+---
+
+# A barplot with `geom_col()` 
+
+.flex[
+.w-40.pr3[
+
+```r
+dfsum &lt;- CPSch3 %&gt;% 
+  group_by(sex) %&gt;% 
+  tally()
+dfsum
+```
+
+```
+## # A tibble: 2 × 2
+##   sex        n
+##   &lt;fct&gt;  &lt;int&gt;
+## 1 male    5956
+## 2 female  5174
+```
+]
+.w-60[
+
+```r
+ggplot(data = dfsum, 
+       mapping = aes(x = sex, 
+                     y = n)) +
+* geom_col()
+```
+
+&lt;img src="images/part1-catalogue/geom-col-1.png" style="display: block; margin: auto;" /&gt;
+]
+]
+
+
+???
+
+* `tally()` is just a shorthand for `summarise(n = n())`. 
+* Sometimes your input data may already contain pre-computed counts. 
+* In this case, you don't need `stat = "count"` to do the counting for you. 
+* You can use `geom_col()` instead.
+* This is essential a short hand for `geom_bar(stat = "identity")` where `stat = "identity"` means that you will take the value as supplied without any statistical tranformation.
+
+---
+
+# Illusrative data 🚢 ship accidents
+
+
+```r
+data(Accident, package = "Ecdat")
+str(Accident)
+```
+
+```
+## 'data.frame':	40 obs. of  5 variables:
+##  $ type   : Factor w/ 5 levels "A","B","C","D",..: 1 1 1 1 1 1 1 1 2 2 ...
+##  $ constr : Factor w/ 4 levels "C6064","C6569",..: 1 1 2 2 3 3 4 4 1 1 ...
+##  $ operate: Factor w/ 2 levels "O6074","O7579": 1 2 1 2 1 2 1 2 1 2 ...
+##  $ months : int  127 63 1095 1095 1512 3353 NA 2244 44882 17176 ...
+##  $ acc    : int  0 0 3 4 6 18 NA 11 39 29 ...
+```
+
+???
+
+* `type` is the ship type
+* `constr` is year constructed
+* `operate` is the year operated
+* `months` is the service amount counted in months
+* `acc` is the number of accidents.
+
+---
+
+name: stacked
+
+# A stacked barplot with `geom_col()`
+
+
+```r
+ggplot(Accident, aes(type, acc, fill = constr, group = operate)) +
+  geom_col(color = "black", position = "stack")
+```
+
+&lt;img src="images/part1-catalogue/geom-col-stack-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* Recall that `geom_col()` is the same as `geom_bar()` except `stat="identity"`, i.e. your input data should already be summarised as count data. 
+* By default the values in `y` are stacked on top of another.
+* The aesthetic `group` here breaks the count in two groups and stack one on top of the other (try running the code without `group = operate`).
+
+
+---
+
+name: grouped
+
+# A grouped barplot with `geom_col()`
+
+
+```r
+ggplot(Accident, aes(type, acc, fill = constr)) +
+  geom_col(color = "black", position = "dodge")
+```
+
+&lt;img src="images/part1-catalogue/geom-col-dodge-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* Notice here we removed the `group = operate` -- this results in stacked bars for the same `type` and `fill`.
+* Here the `x` values are recalculated so that the factor levels within the same group (as determined by `x`) can fit.
+
+---
+
+# Another grouped barplot with `geom_col()`
+
+
+```r
+ggplot(Accident, aes(type, acc, fill = constr, group = operate)) +
+  geom_col(color = "black", position = "dodge2")
+```
+
+&lt;img src="images/part1-catalogue/geom-col-dodge2-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* Can you see what changed?
+* `position = "dodge"` doesn't deal well when there is `fill` and `group` together but you can use `position = "dodge2"` that recalculates the `x` values in another way.
+
+
+---
+
+name: fill
+
+# Stacked percentage barplot with `geom_col()`
+
+
+```r
+ggplot(Accident, aes(type, acc, fill = constr, group = operate)) +
+  geom_col(color = "black", position = "fill")
+```
+
+&lt;img src="images/part1-catalogue/geom-col-fill-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* If you want to compare the percentages between the different `x`, then `position = "fill"` can be handy.
+
+---
+
+# Illustrative data 💎 diamonds
+
+* Let's have a look at the `diamonds` data which contains information about different attributes of diamonds
+
+
+```r
+data(diamonds, package = "ggplot2")
+diamonds
+```
+
+```
+## # A tibble: 53,940 × 10
+##    carat cut       color clarity depth table price     x     y     z
+##    &lt;dbl&gt; &lt;ord&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+##  1  0.23 Ideal     E     SI2      61.5    55   326  3.95  3.98  2.43
+##  2  0.21 Premium   E     SI1      59.8    61   326  3.89  3.84  2.31
+##  3  0.23 Good      E     VS1      56.9    65   327  4.05  4.07  2.31
+##  4  0.29 Premium   I     VS2      62.4    58   334  4.2   4.23  2.63
+##  5  0.31 Good      J     SI2      63.3    58   335  4.34  4.35  2.75
+##  6  0.24 Very Good J     VVS2     62.8    57   336  3.94  3.96  2.48
+##  7  0.24 Very Good I     VVS1     62.3    57   336  3.95  3.98  2.47
+##  8  0.26 Very Good H     SI1      61.9    55   337  4.07  4.11  2.53
+##  9  0.22 Fair      E     VS2      65.1    61   337  3.87  3.78  2.49
+## 10  0.23 Very Good H     VS1      59.4    61   338  4     4.05  2.39
+## # … with 53,930 more rows
+```
+
+---
+
+name: scatter
+
+# A scatterplot with `geom_point()`
+
+
+```r
+ggplot(data = diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_point()
+```
+
+&lt;img src="images/part1-catalogue/geom-point-1.png" style="display: block; margin: auto;" /&gt;
+
+* Scatter plot of price vs carat of diamonds
+* Each point correponds to a dimaond
+
+???
+
+* A scatterplot is useful in visualising two numerical variables 
+* Each point corresponds to an observational unit 
+* If you have other variables, you may like to map this to other aesthetic values, such as `shape` or `color`.
+* When there is a lot of observations, it may be useful to use `alpha` to control the transparency of the points. 
+
+---
+
+name: hex
+
+# A hexagonal 2D heatmap with `geom_hex()`
+
+
+```r
+ggplot(data = diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_hex()
+```
+
+&lt;img src="images/part1-catalogue/geom-hex-1.png" style="display: block; margin: auto;" /&gt;
+
+* A hexagon shows the count of observations within the region.
+
+???
+
+* A hex plot is useful if there is a lot of _overplotting_ in your scatterplot.
+* **_Overplotting_** in data visualisation means that the data or labels overlap in the data visualisation making it harder to distinguish individual data points. * Overplotting typically occurs when you have a large dataset.
+* A hex plot overcomes the issue by showing the number of observations within a hexagonal area.
+* The count is shown by the `fill` in the resulting data visualisation.
+
+---
+
+
+
+# A rectangular 2D heatmap with `geom_bin_2d()`
+
+
+```r
+ggplot(data = diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_bin_2d()
+```
+
+&lt;img src="images/part1-catalogue/geom-bin2d-1.png" style="display: block; margin: auto;" /&gt;
+
+
+???
+
+
+* `geom_bin_2d()` is the same as `geom_hex()` but the shape is a rectangle instead of a hexagon.
+
+
+---
+
+# Count of overlapping points with `geom_count()`
+
+
+```r
+ggplot(data = diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_count()
+```
+
+&lt;img src="images/part1-catalogue/geom-count-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+
+* `geom_count()` counts the number of points in the same location
+* The count is then mapped to the aesthetic `size`. 
+
+---
+
+name: 2D
+
+# Contour of a 2D density with `geom_density_2d()`
+
+
+```r
+ggplot(data = diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_density_2d()
+```
+
+&lt;img src="images/part1-catalogue/geom-density-2d-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* If you have want to visualise the joint density of two variables then `geom_density_2d()` is useful. 
+* The axis shows the density of the corresponding variable.
+* The 2D density is estimated using `MASS::kde2d()`. 
+
+---
+
+# Contour of a 2D density with `geom_density_2d_filled()`
+
+
+```r
+ggplot(data = diamonds,
+       mapping = aes(x = carat, y = price)) +
+  geom_density_2d_filled()
+```
+
+&lt;img src="images/part1-catalogue/geom-density-2d-filled-1.png" style="display: block; margin: auto;" /&gt;
+
+???
+
+* `geom_density_2d()` draws the contour line 
+* `geom_density_2d_filled()` draws the contour bands
+
+---
+
+# Illustrative data ⛰️ volcano 
+
+* The data contains topographic information on Auckland's Maunga Whau Volcano
+
+
+```r
+volcanod &lt;- data.frame(row = as.vector(row(volcano)),
+                       col = as.vector(col(volcano)),
+                       value = as.vector(volcano))
+
+volcanod
+```
+
+```
+##     row col value
+## 1     1   1   100
+## 2     2   1   101
+## 3     3   1   102
+## 4     4   1   103
+## 5     5   1   104
+## 6     6   1   105
+## 7     7   1   105
+## 8     8   1   106
+## 9     9   1   107
+## 10   10   1   108
+## 11   11   1   109
+## 12   12   1   110
+## 13   13   1   110
+## 14   14   1   111
+## 15   15   1   114
+## 16   16   1   116
+## 17   17   1   118
+## 18   18   1   120
+## 19   19   1   120
+## 20   20   1   121
+## 21   21   1   122
+## 22   22   1   122
+## 23   23   1   123
+## 24   24   1   124
+## 25   25   1   123
+## 26   26   1   123
+## 27   27   1   120
+## 28   28   1   118
+## 29   29   1   117
+## 30   30   1   115
+## 31   31   1   114
+## 32   32   1   115
+## 33   33   1   113
+## 34   34   1   111
+## 35   35   1   110
+## 36   36   1   109
+## 37   37   1   108
+## 38   38   1   108
+## 39   39   1   107
+## 40   40   1   107
+## 41   41   1   107
+## 42   42   1   108
+## 43   43   1   109
+## 44   44   1   110
+## 45   45   1   111
+## 46   46   1   111
+## 47   47   1   112
+## 48   48   1   113
+## 49   49   1   113
+## 50   50   1   114
+## 51   51   1   115
+## 52   52   1   115
+## 53   53   1   114
+## 54   54   1   113
+## 55   55   1   112
+## 56   56   1   111
+## 57   57   1   111
+## 58   58   1   112
+## 59   59   1   112
+## 60   60   1   112
+## 61   61   1   113
+## 62   62   1   114
+## 63   63   1   114
+## 64   64   1   115
+## 65   65   1   115
+## 66   66   1   116
+## 67   67   1   116
+## 68   68   1   117
+## 69   69   1   117
+## 70   70   1   116
+## 71   71   1   114
+## 72   72   1   112
+## 73   73   1   109
+## 74   74   1   106
+## 75   75   1   104
+## 76   76   1   102
+## 77   77   1   101
+## 78   78   1   100
+## 79   79   1   100
+## 80   80   1    99
+## 81   81   1    99
+## 82   82   1    99
+## 83   83   1    99
+## 84   84   1    98
+## 85   85   1    98
+## 86   86   1    97
+## 87   87   1    97
+## 88    1   2   100
+## 89    2   2   101
+## 90    3   2   102
+## 91    4   2   103
+## 92    5   2   104
+## 93    6   2   105
+## 94    7   2   106
+## 95    8   2   107
+## 96    9   2   108
+## 97   10   2   109
+## 98   11   2   110
+## 99   12   2   110
+## 100  13   2   111
+## 101  14   2   113
+## 102  15   2   115
+## 103  16   2   118
+## 104  17   2   120
+## 105  18   2   121
+## 106  19   2   122
+## 107  20   2   124
+## 108  21   2   125
+## 109  22   2   125
+## 110  23   2   126
+## 111  24   2   127
+## 112  25   2   128
+## 113  26   2   127
+## 114  27   2   124
+## 115  28   2   121
+## 116  29   2   120
+## 117  30   2   118
+## 118  31   2   116
+## 119  32   2   114
+## 120  33   2   113
+## 121  34   2   112
+## 122  35   2   112
+## 123  36   2   110
+## 124  37   2   109
+## 125  38   2   109
+## 126  39   2   108
+## 127  40   2   108
+## 128  41   2   108
+## 129  42   2   109
+## 130  43   2   110
+## 131  44   2   111
+## 132  45   2   112
+## 133  46   2   112
+## 134  47   2   113
+## 135  48   2   114
+## 136  49   2   114
+## 137  50   2   115
+## 138  51   2   116
+## 139  52   2   116
+## 140  53   2   115
+## 141  54   2   114
+## 142  55   2   113
+## 143  56   2   112
+## 144  57   2   112
+## 145  58   2   113
+## 146  59   2   113
+## 147  60   2   114
+## 148  61   2   114
+## 149  62   2   115
+## 150  63   2   115
+## 151  64   2   116
+## 152  65   2   116
+## 153  66   2   117
+## 154  67   2   117
+## 155  68   2   118
+## 156  69   2   118
+## 157  70   2   117
+## 158  71   2   115
+## 159  72   2   113
+## 160  73   2   111
+## 161  74   2   107
+## 162  75   2   105
+## 163  76   2   103
+## 164  77   2   102
+## 165  78   2   101
+## 166  79   2   101
+## 167  80   2   100
+## 168  81   2   100
+## 169  82   2   100
+## 170  83   2    99
+## 171  84   2    99
+## 172  85   2    98
+## 173  86   2    98
+## 174  87   2    97
+## 175   1   3   101
+## 176   2   3   102
+## 177   3   3   103
+## 178   4   3   104
+## 179   5   3   105
+## 180   6   3   105
+## 181   7   3   106
+## 182   8   3   107
+## 183   9   3   108
+## 184  10   3   109
+## 185  11   3   110
+## 186  12   3   111
+## 187  13   3   113
+## 188  14   3   115
+## 189  15   3   117
+## 190  16   3   118
+## 191  17   3   120
+## 192  18   3   122
+## 193  19   3   125
+## 194  20   3   126
+## 195  21   3   127
+## 196  22   3   128
+## 197  23   3   129
+## 198  24   3   130
+## 199  25   3   131
+## 200  26   3   131
+## 201  27   3   128
+## 202  28   3   125
+## 203  29   3   121
+## 204  30   3   120
+## 205  31   3   118
+## 206  32   3   116
+## 207  33   3   114
+## 208  34   3   113
+## 209  35   3   113
+## 210  36   3   111
+## 211  37   3   111
+## 212  38   3   111
+## 213  39   3   111
+## 214  40   3   110
+## 215  41   3   109
+## 216  42   3   110
+## 217  43   3   111
+## 218  44   3   112
+## 219  45   3   113
+## 220  46   3   113
+## 221  47   3   114
+## 222  48   3   115
+## 223  49   3   115
+## 224  50   3   116
+## 225  51   3   117
+## 226  52   3   117
+## 227  53   3   116
+## 228  54   3   115
+## 229  55   3   114
+## 230  56   3   114
+## 231  57   3   113
+## 232  58   3   113
+## 233  59   3   114
+## 234  60   3   114
+## 235  61   3   115
+## 236  62   3   115
+## 237  63   3   116
+## 238  64   3   116
+## 239  65   3   117
+## 240  66   3   118
+## 241  67   3   118
+## 242  68   3   119
+## 243  69   3   119
+## 244  70   3   118
+## 245  71   3   116
+## 246  72   3   114
+## 247  73   3   112
+## 248  74   3   108
+## 249  75   3   105
+## 250  76   3   103
+## 251  77   3   103
+## 252  78   3   102
+## 253  79   3   101
+## 254  80   3   101
+## 255  81   3   100
+## 256  82   3   100
+## 257  83   3    99
+## 258  84   3    99
+## 259  85   3    98
+## 260  86   3    98
+## 261  87   3    97
+## 262   1   4   101
+## 263   2   4   102
+## 264   3   4   103
+## 265   4   4   104
+## 266   5   4   105
+## 267   6   4   106
+## 268   7   4   107
+## 269   8   4   108
+## 270   9   4   109
+## 271  10   4   110
+## 272  11   4   111
+## 273  12   4   113
+## 274  13   4   115
+## 275  14   4   117
+## 276  15   4   117
+## 277  16   4   118
+## 278  17   4   121
+## 279  18   4   123
+## 280  19   4   126
+## 281  20   4   128
+## 282  21   4   130
+## 283  22   4   130
+## 284  23   4   131
+## 285  24   4   132
+## 286  25   4   133
+## 287  26   4   134
+## 288  27   4   131
+## 289  28   4   129
+## 290  29   4   125
+## 291  30   4   122
+## 292  31   4   120
+## 293  32   4   118
+## 294  33   4   116
+## 295  34   4   114
+## 296  35   4   113
+## 297  36   4   112
+## 298  37   4   112
+## 299  38   4   113
+## 300  39   4   112
+## 301  40   4   112
+## 302  41   4   111
+## 303  42   4   112
+## 304  43   4   113
+## 305  44   4   113
+## 306  45   4   114
+## 307  46   4   115
+## 308  47   4   116
+## 309  48   4   116
+## 310  49   4   117
+## 311  50   4   117
+## 312  51   4   118
+## 313  52   4   118
+## 314  53   4   116
+## 315  54   4   116
+## 316  55   4   115
+## 317  56   4   115
+## 318  57   4   115
+## 319  58   4   114
+## 320  59   4   114
+## 321  60   4   115
+## 322  61   4   116
+## 323  62   4   116
+## 324  63   4   117
+## 325  64   4   117
+## 326  65   4   118
+## 327  66   4   118
+## 328  67   4   119
+## 329  68   4   119
+## 330  69   4   120
+## 331  70   4   120
+## 332  71   4   117
+## 333  72   4   115
+##  [ reached 'max' / getOption("max.print") -- omitted 4974 rows ]
+```
+
+???
+
+* The original data is a matrix and we must wrangle in the form ready for `ggplot` first.
+
+
+---
+
+# A 2D contour plot with `geom_contour()`
+
+
+```r
+ggplot(data = volcanod, 
+       mapping = aes(x = col, y = row, z = value)) + 
+  geom_contour()
+```
+
+&lt;img src="images/part1-catalogue/geom-contour-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# A 2D contour plot with `geom_contour_filled()`
+
+
+```r
+ggplot(data = volcanod, 
+       mapping = aes(x = col, y = row, z = value)) + 
+  geom_contour_filled()
+```
+
+&lt;img src="images/part1-catalogue/geom-contour-filled-1.png" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+name: tile
+
+# Tile plots with `geom_tile()`
+
+
+```r
+ggplot(volcanod, aes(col, row, fill = value)) +
+ geom_tile()
+```
+
+&lt;img src="images/part1-catalogue/geom-tile-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Raster plots with `geom_raster()`
+
+
+```r
+ggplot(volcanod, aes(col, row, fill = value)) +
+ geom_raster()
+```
+
+&lt;img src="images/part1-catalogue/geom-raster-1.png" style="display: block; margin: auto;" /&gt;
+
+* A high performance special case of `geom_tile()` for when the tiles are the same size
+
+---
+
+# Rectangular plots with `geom_rect()`
+
+
+```r
+ggplot(volcanod, aes(xmin = col - 0.5, xmax = col + 0.5,
+                     ymin = row - 0.5, ymax = row + 0.5, fill = value)) +
+ geom_rect()
+```
+
+&lt;img src="images/part1-catalogue/geom-rect-1.png" style="display: block; margin: auto;" /&gt;
+
+* A reparameterised version of `geom_tile()`
+
+---
+
+# Illustrative data 📈 economics
+
+
+
+```r
+data(economics, package = "ggplot2")
+economics
+```
+
+```
+## # A tibble: 574 × 6
+##    date         pce    pop psavert uempmed unemploy
+##    &lt;date&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+##  1 1967-07-01  507. 198712    12.6     4.5     2944
+##  2 1967-08-01  510. 198911    12.6     4.7     2945
+##  3 1967-09-01  516. 199113    11.9     4.6     2958
+##  4 1967-10-01  512. 199311    12.9     4.9     3143
+##  5 1967-11-01  517. 199498    12.8     4.7     3066
+##  6 1967-12-01  525. 199657    11.8     4.8     3018
+##  7 1968-01-01  531. 199808    11.7     5.1     2878
+##  8 1968-02-01  534. 199920    12.3     4.5     3001
+##  9 1968-03-01  544. 200056    11.7     4.1     2877
+## 10 1968-04-01  544  200208    12.3     4.6     2709
+## # … with 564 more rows
+```
+
+
+---
+
+name: line
+
+# Line plot with `geom_line()`
+
+
+```r
+ggplot(economics, aes(date, unemploy)) + 
+  geom_line()
+```
+
+&lt;img src="images/part1-catalogue/geom-line-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+# `geom_path()`
+
+
+```r
+ggplot(economics, aes(unemploy/pop, psavert)) +
+  geom_path()
+```
+
+&lt;img src="images/part1-catalogue/geom-path-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# `geom_step()`
+
+
+```r
+ggplot(economics, aes(unemploy/pop, psavert)) +
+  geom_step()
+```
+
+&lt;img src="images/part1-catalogue/geom-step-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Drawing maps
+
+* Drawing maps require the map data 
+
+
+```r
+world &lt;- map_data("world")
+world
+```
+
+```
+##          long      lat group order      region subregion
+## 1   -69.89912 12.45200     1     1       Aruba      &lt;NA&gt;
+## 2   -69.89571 12.42300     1     2       Aruba      &lt;NA&gt;
+## 3   -69.94219 12.43853     1     3       Aruba      &lt;NA&gt;
+## 4   -70.00415 12.50049     1     4       Aruba      &lt;NA&gt;
+## 5   -70.06612 12.54697     1     5       Aruba      &lt;NA&gt;
+## 6   -70.05088 12.59707     1     6       Aruba      &lt;NA&gt;
+## 7   -70.03511 12.61411     1     7       Aruba      &lt;NA&gt;
+## 8   -69.97314 12.56763     1     8       Aruba      &lt;NA&gt;
+## 9   -69.91181 12.48047     1     9       Aruba      &lt;NA&gt;
+## 10  -69.89912 12.45200     1    10       Aruba      &lt;NA&gt;
+## 12   74.89131 37.23164     2    12 Afghanistan      &lt;NA&gt;
+## 13   74.84023 37.22505     2    13 Afghanistan      &lt;NA&gt;
+## 14   74.76738 37.24917     2    14 Afghanistan      &lt;NA&gt;
+## 15   74.73896 37.28564     2    15 Afghanistan      &lt;NA&gt;
+## 16   74.72666 37.29072     2    16 Afghanistan      &lt;NA&gt;
+## 17   74.66895 37.26670     2    17 Afghanistan      &lt;NA&gt;
+## 18   74.55899 37.23662     2    18 Afghanistan      &lt;NA&gt;
+## 19   74.37217 37.15771     2    19 Afghanistan      &lt;NA&gt;
+## 20   74.37617 37.13735     2    20 Afghanistan      &lt;NA&gt;
+## 21   74.49796 37.05722     2    21 Afghanistan      &lt;NA&gt;
+## 22   74.52646 37.03066     2    22 Afghanistan      &lt;NA&gt;
+## 23   74.54140 37.02217     2    23 Afghanistan      &lt;NA&gt;
+## 24   74.43106 36.98369     2    24 Afghanistan      &lt;NA&gt;
+## 25   74.19473 36.89688     2    25 Afghanistan      &lt;NA&gt;
+## 26   74.03887 36.82573     2    26 Afghanistan      &lt;NA&gt;
+## 27   74.00185 36.82310     2    27 Afghanistan      &lt;NA&gt;
+## 28   73.90781 36.85293     2    28 Afghanistan      &lt;NA&gt;
+## 29   73.76914 36.88848     2    29 Afghanistan      &lt;NA&gt;
+## 30   73.73183 36.88779     2    30 Afghanistan      &lt;NA&gt;
+## 31   73.41113 36.88169     2    31 Afghanistan      &lt;NA&gt;
+## 32   73.11680 36.86856     2    32 Afghanistan      &lt;NA&gt;
+## 33   72.99374 36.85161     2    33 Afghanistan      &lt;NA&gt;
+## 34   72.76621 36.83501     2    34 Afghanistan      &lt;NA&gt;
+## 35   72.62286 36.82959     2    35 Afghanistan      &lt;NA&gt;
+## 36   72.53135 36.80200     2    36 Afghanistan      &lt;NA&gt;
+## 37   72.43115 36.76582     2    37 Afghanistan      &lt;NA&gt;
+## 38   72.32696 36.74239     2    38 Afghanistan      &lt;NA&gt;
+## 39   72.24980 36.73472     2    39 Afghanistan      &lt;NA&gt;
+## 40   72.15674 36.70088     2    40 Afghanistan      &lt;NA&gt;
+## 41   72.09560 36.63374     2    41 Afghanistan      &lt;NA&gt;
+## 42   71.92070 36.53418     2    42 Afghanistan      &lt;NA&gt;
+## 43   71.82227 36.48608     2    43 Afghanistan      &lt;NA&gt;
+## 44   71.77266 36.43184     2    44 Afghanistan      &lt;NA&gt;
+## 45   71.71641 36.42656     2    45 Afghanistan      &lt;NA&gt;
+## 46   71.62051 36.43647     2    46 Afghanistan      &lt;NA&gt;
+## 47   71.54590 36.37769     2    47 Afghanistan      &lt;NA&gt;
+## 48   71.46328 36.29326     2    48 Afghanistan      &lt;NA&gt;
+## 49   71.31260 36.17119     2    49 Afghanistan      &lt;NA&gt;
+## 50   71.23291 36.12178     2    50 Afghanistan      &lt;NA&gt;
+## 51   71.18506 36.04209     2    51 Afghanistan      &lt;NA&gt;
+## 52   71.22021 36.00068     2    52 Afghanistan      &lt;NA&gt;
+## 53   71.34287 35.93853     2    53 Afghanistan      &lt;NA&gt;
+## 54   71.39756 35.88018     2    54 Afghanistan      &lt;NA&gt;
+## 55   71.42754 35.83374     2    55 Afghanistan      &lt;NA&gt;
+## 56   71.48359 35.71460     2    56 Afghanistan      &lt;NA&gt;
+## 57   71.51904 35.59751     2    57 Afghanistan      &lt;NA&gt;
+## 58   71.57198 35.54683     2    58 Afghanistan      &lt;NA&gt;
+## 59   71.58740 35.46084     2    59 Afghanistan      &lt;NA&gt;
+## 60   71.60059 35.40791     2    60 Afghanistan      &lt;NA&gt;
+## 61   71.57198 35.37041     2    61 Afghanistan      &lt;NA&gt;
+## 62   71.54551 35.32851     2    62 Afghanistan      &lt;NA&gt;
+## 63   71.54551 35.28886     2    63 Afghanistan      &lt;NA&gt;
+## 64   71.57725 35.24800     2    64 Afghanistan      &lt;NA&gt;
+## 65   71.60527 35.21177     2    65 Afghanistan      &lt;NA&gt;
+## 66   71.62051 35.18301     2    66 Afghanistan      &lt;NA&gt;
+## 67   71.60166 35.15068     2    67 Afghanistan      &lt;NA&gt;
+## 68   71.54551 35.10141     2    68 Afghanistan      &lt;NA&gt;
+## 69   71.51709 35.05112     2    69 Afghanistan      &lt;NA&gt;
+## 70   71.45508 34.96694     2    70 Afghanistan      &lt;NA&gt;
+## 71   71.35811 34.90962     2    71 Afghanistan      &lt;NA&gt;
+## 72   71.29414 34.86773     2    72 Afghanistan      &lt;NA&gt;
+## 73   71.22578 34.77954     2    73 Afghanistan      &lt;NA&gt;
+## 74   71.11328 34.68159     2    74 Afghanistan      &lt;NA&gt;
+## 75   71.06563 34.59961     2    75 Afghanistan      &lt;NA&gt;
+## 76   71.01631 34.55464     2    76 Afghanistan      &lt;NA&gt;
+## 77   70.96562 34.53037     2    77 Afghanistan      &lt;NA&gt;
+## 78   70.97891 34.48628     2    78 Afghanistan      &lt;NA&gt;
+## 79   71.02295 34.43115     2    79 Afghanistan      &lt;NA&gt;
+## 80   71.09570 34.36943     2    80 Afghanistan      &lt;NA&gt;
+## 81   71.09238 34.27324     2    81 Afghanistan      &lt;NA&gt;
+## 82   71.08906 34.20406     2    82 Afghanistan      &lt;NA&gt;
+## 83   71.09131 34.12027     2    83 Afghanistan      &lt;NA&gt;
+## 84   71.05156 34.04971     2    84 Afghanistan      &lt;NA&gt;
+## 85   70.84844 33.98188     2    85 Afghanistan      &lt;NA&gt;
+## 86   70.65401 33.95229     2    86 Afghanistan      &lt;NA&gt;
+## 87   70.41573 33.95044     2    87 Afghanistan      &lt;NA&gt;
+## 88   70.32568 33.96113     2    88 Afghanistan      &lt;NA&gt;
+## 89   70.25361 33.97598     2    89 Afghanistan      &lt;NA&gt;
+## 90   69.99473 34.05181     2    90 Afghanistan      &lt;NA&gt;
+## 91   69.88965 34.00727     2    91 Afghanistan      &lt;NA&gt;
+## 92   69.86806 33.89766     2    92 Afghanistan      &lt;NA&gt;
+## 93   70.05664 33.71987     2    93 Afghanistan      &lt;NA&gt;
+## 94   70.13418 33.62075     2    94 Afghanistan      &lt;NA&gt;
+## 95   70.21973 33.45469     2    95 Afghanistan      &lt;NA&gt;
+## 96   70.28418 33.36904     2    96 Afghanistan      &lt;NA&gt;
+## 97   70.26113 33.28901     2    97 Afghanistan      &lt;NA&gt;
+## 98   70.09023 33.19810     2    98 Afghanistan      &lt;NA&gt;
+## 99   69.92012 33.11250     2    99 Afghanistan      &lt;NA&gt;
+## 100  69.70371 33.09473     2   100 Afghanistan      &lt;NA&gt;
+## 101  69.56777 33.06416     2   101 Afghanistan      &lt;NA&gt;
+## 102  69.50156 33.02007     2   102 Afghanistan      &lt;NA&gt;
+## 103  69.45312 32.83281     2   103 Afghanistan      &lt;NA&gt;
+## 104  69.40459 32.76426     2   104 Afghanistan      &lt;NA&gt;
+## 105  69.40537 32.68272     2   105 Afghanistan      &lt;NA&gt;
+## 106  69.35947 32.59033     2   106 Afghanistan      &lt;NA&gt;
+## 107  69.28994 32.53057     2   107 Afghanistan      &lt;NA&gt;
+## 108  69.24140 32.43354     2   108 Afghanistan      &lt;NA&gt;
+## 109  69.25654 32.24946     2   109 Afghanistan      &lt;NA&gt;
+## 110  69.27930 31.93682     2   110 Afghanistan      &lt;NA&gt;
+## 111  69.18691 31.83809     2   111 Afghanistan      &lt;NA&gt;
+## 112  69.08311 31.73848     2   112 Afghanistan      &lt;NA&gt;
+## 113  68.97343 31.66738     2   113 Afghanistan      &lt;NA&gt;
+## 114  68.86895 31.63423     2   114 Afghanistan      &lt;NA&gt;
+## 115  68.78233 31.64643     2   115 Afghanistan      &lt;NA&gt;
+## 116  68.71367 31.70806     2   116 Afghanistan      &lt;NA&gt;
+## 117  68.67324 31.75972     2   117 Afghanistan      &lt;NA&gt;
+## 118  68.59766 31.80298     2   118 Afghanistan      &lt;NA&gt;
+## 119  68.52071 31.79414     2   119 Afghanistan      &lt;NA&gt;
+## 120  68.44326 31.75449     2   120 Afghanistan      &lt;NA&gt;
+## 121  68.31982 31.76767     2   121 Afghanistan      &lt;NA&gt;
+## 122  68.21397 31.80737     2   122 Afghanistan      &lt;NA&gt;
+## 123  68.16103 31.80298     2   123 Afghanistan      &lt;NA&gt;
+## 124  68.13017 31.76328     2   124 Afghanistan      &lt;NA&gt;
+## 125  68.01719 31.67798     2   125 Afghanistan      &lt;NA&gt;
+## 126  67.73985 31.54819     2   126 Afghanistan      &lt;NA&gt;
+## 127  67.62675 31.53877     2   127 Afghanistan      &lt;NA&gt;
+## 128  67.57822 31.50649     2   128 Afghanistan      &lt;NA&gt;
+## 129  67.59756 31.45332     2   129 Afghanistan      &lt;NA&gt;
+## 130  67.64706 31.40996     2   130 Afghanistan      &lt;NA&gt;
+## 131  67.73350 31.37925     2   131 Afghanistan      &lt;NA&gt;
+## 132  67.73789 31.34395     2   132 Afghanistan      &lt;NA&gt;
+## 133  67.66152 31.31299     2   133 Afghanistan      &lt;NA&gt;
+## 134  67.59639 31.27769     2   134 Afghanistan      &lt;NA&gt;
+## 135  67.45283 31.23462     2   135 Afghanistan      &lt;NA&gt;
+## 136  67.28730 31.21782     2   136 Afghanistan      &lt;NA&gt;
+## 137  67.11592 31.24292     2   137 Afghanistan      &lt;NA&gt;
+## 138  67.02773 31.30024     2   138 Afghanistan      &lt;NA&gt;
+## 139  66.92432 31.30561     2   139 Afghanistan      &lt;NA&gt;
+## 140  66.82929 31.26367     2   140 Afghanistan      &lt;NA&gt;
+## 141  66.73135 31.19453     2   141 Afghanistan      &lt;NA&gt;
+## 142  66.62422 31.04604     2   142 Afghanistan      &lt;NA&gt;
+## 143  66.59580 31.01997     2   143 Afghanistan      &lt;NA&gt;
+## 144  66.56680 30.99658     2   144 Afghanistan      &lt;NA&gt;
+## 145  66.49736 30.96455     2   145 Afghanistan      &lt;NA&gt;
+## 146  66.39717 30.91221     2   146 Afghanistan      &lt;NA&gt;
+## 147  66.34687 30.80278     2   147 Afghanistan      &lt;NA&gt;
+## 148  66.28691 30.60791     2   148 Afghanistan      &lt;NA&gt;
+## 149  66.30097 30.50298     2   149 Afghanistan      &lt;NA&gt;
+## 150  66.30547 30.32114     2   150 Afghanistan      &lt;NA&gt;
+## 151  66.28184 30.19346     2   151 Afghanistan      &lt;NA&gt;
+## 152  66.23848 30.10962     2   152 Afghanistan      &lt;NA&gt;
+## 153  66.24717 30.04351     2   153 Afghanistan      &lt;NA&gt;
+## 154  66.31338 29.96856     2   154 Afghanistan      &lt;NA&gt;
+## 155  66.28691 29.92002     2   155 Afghanistan      &lt;NA&gt;
+## 156  66.23125 29.86572     2   156 Afghanistan      &lt;NA&gt;
+## 157  66.17706 29.83559     2   157 Afghanistan      &lt;NA&gt;
+## 158  65.96162 29.77891     2   158 Afghanistan      &lt;NA&gt;
+## 159  65.66621 29.70132     2   159 Afghanistan      &lt;NA&gt;
+## 160  65.47099 29.65156     2   160 Afghanistan      &lt;NA&gt;
+## 161  65.18047 29.57763     2   161 Afghanistan      &lt;NA&gt;
+## 162  65.09550 29.55947     2   162 Afghanistan      &lt;NA&gt;
+## 163  64.91895 29.55278     2   163 Afghanistan      &lt;NA&gt;
+## 164  64.82734 29.56416     2   164 Afghanistan      &lt;NA&gt;
+## 165  64.70351 29.56714     2   165 Afghanistan      &lt;NA&gt;
+## 166  64.52110 29.56450     2   166 Afghanistan      &lt;NA&gt;
+## 167  64.39375 29.54433     2   167 Afghanistan      &lt;NA&gt;
+##  [ reached 'max' / getOption("max.print") -- omitted 99172 rows ]
+```
+
+---
+
+name: map
+
+# Drawing world map with `geom_polygon()`
+
+
+```r
+world &lt;- map_data("world")
+ggplot(world, aes(long, lat, group = group)) +
+  geom_polygon()
+```
+
+&lt;img src="images/part1-catalogue/geom-polygon-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+
+# Other layers 
+
+* There are more layers in `ggplot`!
+* There are layers also beginning with `stat_`.
+* There are also many extension packages to draw more plots: https://exts.ggplot2.tidyverse.org/gallery/ 
+* It is normal to google and copy-and-paste code that you find on the web. 
+* `ggplot2` is also [continually updated](https://github.com/tidyverse/ggplot2/blob/main/NEWS.md) so some new features may be added in the future. 
+
+
+
+
+
+
+---
+
+
+
+class: font_smaller
+background-color: #e5e5e5
+
+# Session Information
+
+.scroll-350[
+
+
+
+```r
+devtools::session_info()
+```
+
+```
+## ─ Session info  3️⃣  🧛🏻  👨🏾   ─────────────────────────────────────────────────────────────────────────
+##  hash: keycap: 3, vampire: light skin tone, man: medium-dark skin tone
+## 
+##  setting  value
+##  version  R version 4.1.2 (2021-11-01)
+##  os       macOS Big Sur 11.6.2
+##  system   x86_64, darwin17.0
+##  ui       RStudio
+##  language (EN)
+##  collate  en_AU.UTF-8
+##  ctype    en_AU.UTF-8
+##  tz       Australia/Melbourne
+##  date     2022-02-20
+##  rstudio  2022.02.0-preview+392 Prairie Trillium (desktop)
+##  pandoc   2.17.1.1 @ /usr/local/bin/ (via rmarkdown)
+## 
+## ─ Packages ──────────────────────────────────────────────────────────────────────────────────────────
+##  package     * version date (UTC) lib source
+##  anicon        0.1.0   2021-11-30 [1] Github (emitanaka/anicon@0b756df)
+##  assertthat    0.2.1   2019-03-21 [1] CRAN (R 4.1.0)
+##  backports     1.3.0   2021-10-27 [1] CRAN (R 4.1.0)
+##  bitops        1.0-7   2021-04-24 [1] CRAN (R 4.1.0)
+##  broom         0.7.10  2021-10-31 [1] CRAN (R 4.1.0)
+##  bslib         0.3.1   2021-10-06 [1] CRAN (R 4.1.0)
+##  cachem        1.0.6   2021-08-19 [1] CRAN (R 4.1.0)
+##  callr         3.7.0   2021-04-20 [1] CRAN (R 4.1.0)
+##  cellranger    1.1.0   2016-07-27 [1] CRAN (R 4.1.0)
+##  class         7.3-19  2021-05-03 [1] CRAN (R 4.1.2)
+##  classInt      0.4-3   2020-04-07 [1] CRAN (R 4.1.0)
+##  cli           3.2.0   2022-02-14 [1] CRAN (R 4.1.2)
+##  codetools     0.2-18  2020-11-04 [1] CRAN (R 4.1.2)
+##  colorspace    2.0-2   2021-06-24 [1] CRAN (R 4.1.0)
+##  crayon        1.5.0   2022-02-14 [1] CRAN (R 4.1.2)
+##  crosstalk     1.2.0   2021-11-04 [1] CRAN (R 4.1.0)
+##  data.table    1.14.2  2021-09-27 [1] CRAN (R 4.1.0)
+##  datasauRus  * 0.1.4   2018-09-20 [1] CRAN (R 4.1.0)
+##  DBI           1.1.1   2021-01-15 [1] CRAN (R 4.1.0)
+##  dbplyr        2.1.1   2021-04-06 [1] CRAN (R 4.1.0)
+##  desc          1.4.0   2021-09-28 [1] CRAN (R 4.1.0)
+##  devtools      2.4.2   2021-06-07 [1] CRAN (R 4.1.0)
+##  digest        0.6.29  2021-12-01 [1] CRAN (R 4.1.0)
+##  dplyr       * 1.0.7   2021-06-18 [1] CRAN (R 4.1.0)
+##  DT            0.20    2021-11-15 [1] CRAN (R 4.1.0)
+##  e1071         1.7-9   2021-09-16 [1] CRAN (R 4.1.0)
+##  ellipsis      0.3.2   2021-04-29 [1] CRAN (R 4.1.0)
+##  evaluate      0.14    2019-05-28 [1] CRAN (R 4.1.0)
+##  fansi         1.0.2   2022-01-14 [1] CRAN (R 4.1.2)
+##  farver        2.1.0   2021-02-28 [1] CRAN (R 4.1.0)
+##  fastmap       1.1.0   2021-01-25 [1] CRAN (R 4.1.0)
+##  forcats     * 0.5.1   2021-01-27 [1] CRAN (R 4.1.0)
+##  fs            1.5.2   2021-12-08 [1] CRAN (R 4.1.0)
+##  gapminder   * 0.3.0   2017-10-31 [1] CRAN (R 4.1.0)
+##  generics      0.1.2   2022-01-31 [1] CRAN (R 4.1.2)
+##  gganimate   * 1.0.7   2020-10-15 [1] CRAN (R 4.1.0)
+##  ggmap       * 3.0.0   2019-02-05 [1] CRAN (R 4.1.0)
+##  ggplot2     * 3.3.5   2021-06-25 [1] CRAN (R 4.1.0)
+##  ggthemes    * 4.2.4   2021-01-20 [1] CRAN (R 4.1.0)
+##  glue          1.6.1   2022-01-22 [1] CRAN (R 4.1.2)
+##  gridExtra     2.3     2017-09-09 [1] CRAN (R 4.1.0)
+##  gtable        0.3.0   2019-03-25 [1] CRAN (R 4.1.0)
+##  haven         2.4.3   2021-08-04 [1] CRAN (R 4.1.0)
+##  hexbin        1.28.2  2021-01-08 [1] CRAN (R 4.1.0)
+##  highr         0.9     2021-04-16 [1] CRAN (R 4.1.0)
+##  hms           1.1.1   2021-09-26 [1] CRAN (R 4.1.0)
+##  htmltools     0.5.2   2021-08-25 [1] CRAN (R 4.1.0)
+##  htmlwidgets   1.5.4   2021-09-08 [1] CRAN (R 4.1.0)
+##  httpuv        1.6.4   2021-12-14 [1] CRAN (R 4.1.0)
+##  httr          1.4.2   2020-07-20 [1] CRAN (R 4.1.0)
+##  icon          0.1.0   2021-11-30 [1] Github (emitanaka/icon@8458546)
+##  isoband       0.2.5   2021-07-13 [1] CRAN (R 4.1.0)
+##  jpeg          0.1-9   2021-07-24 [1] CRAN (R 4.1.0)
+##  jquerylib     0.1.4   2021-04-26 [1] CRAN (R 4.1.0)
+##  jsonlite      1.7.3   2022-01-17 [1] CRAN (R 4.1.2)
+##  KernSmooth    2.23-20 2021-05-03 [1] CRAN (R 4.1.2)
+##  knitr         1.37    2021-12-16 [1] CRAN (R 4.1.0)
+##  labeling      0.4.2   2020-10-20 [1] CRAN (R 4.1.0)
+##  later         1.3.0   2021-08-18 [1] CRAN (R 4.1.0)
+##  lattice       0.20-45 2021-09-22 [1] CRAN (R 4.1.2)
+##  lazyeval      0.2.2   2019-03-15 [1] CRAN (R 4.1.0)
+##  leaflet     * 2.0.4.1 2021-01-07 [1] CRAN (R 4.1.0)
+##  lifecycle     1.0.1   2021-09-24 [1] CRAN (R 4.1.0)
+##  lubridate   * 1.8.0   2021-10-07 [1] CRAN (R 4.1.0)
+##  magick        2.7.3   2021-08-18 [1] CRAN (R 4.1.0)
+##  magrittr      2.0.2   2022-01-26 [1] CRAN (R 4.1.2)
+##  maps          3.4.0   2021-09-25 [1] CRAN (R 4.1.0)
+##  MASS          7.3-54  2021-05-03 [1] CRAN (R 4.1.2)
+##  memoise       2.0.0   2021-01-26 [1] CRAN (R 4.1.0)
+##  mime          0.12    2021-09-28 [1] CRAN (R 4.1.0)
+##  modelr        0.1.8   2020-05-19 [1] CRAN (R 4.1.0)
+##  munsell       0.5.0   2018-06-12 [1] CRAN (R 4.1.0)
+##  oz            1.0-21  2016-12-08 [1] CRAN (R 4.1.0)
+##  ozmaps      * 0.4.5   2021-08-03 [1] CRAN (R 4.1.0)
+##  pillar        1.7.0   2022-02-01 [1] CRAN (R 4.1.2)
+##  pkgbuild      1.2.0   2020-12-15 [1] CRAN (R 4.1.0)
+##  pkgconfig     2.0.3   2019-09-22 [1] CRAN (R 4.1.0)
+##  pkgload       1.2.3   2021-10-13 [1] CRAN (R 4.1.0)
+##  plotly      * 4.10.0  2021-10-09 [1] CRAN (R 4.1.0)
+##  plyr          1.8.6   2020-03-03 [1] CRAN (R 4.1.0)
+##  png           0.1-7   2013-12-03 [1] CRAN (R 4.1.0)
+##  prettyunits   1.1.1   2020-01-24 [1] CRAN (R 4.1.0)
+##  processx      3.5.2   2021-04-30 [1] CRAN (R 4.1.0)
+##  progress      1.2.2   2019-05-16 [1] CRAN (R 4.1.0)
+##  promises      1.2.0.1 2021-02-11 [1] CRAN (R 4.1.0)
+##  prompt        1.0.1   2021-03-12 [1] CRAN (R 4.1.0)
+##  proxy         0.4-26  2021-06-07 [1] CRAN (R 4.1.0)
+##  ps            1.6.0   2021-02-28 [1] CRAN (R 4.1.0)
+##  purrr       * 0.3.4   2020-04-17 [1] CRAN (R 4.1.0)
+##  R6            2.5.1   2021-08-19 [1] CRAN (R 4.1.0)
+##  Rcpp          1.0.8   2022-01-13 [1] CRAN (R 4.1.2)
+##  readr       * 2.1.2   2022-01-30 [1] CRAN (R 4.1.2)
+##  readxl        1.3.1   2019-03-13 [1] CRAN (R 4.1.0)
+##  remotes       2.4.1   2021-09-29 [1] CRAN (R 4.1.0)
+##  reprex        2.0.1   2021-08-05 [1] CRAN (R 4.1.0)
+##  RgoogleMaps   1.4.5.3 2020-02-12 [1] CRAN (R 4.1.0)
+##  rjson         0.2.20  2018-06-08 [1] CRAN (R 4.1.0)
+##  rlang         1.0.1   2022-02-03 [1] CRAN (R 4.1.2)
+##  rmarkdown     2.11    2021-09-14 [1] CRAN (R 4.1.0)
+##  rprojroot     2.0.2   2020-11-15 [1] CRAN (R 4.1.0)
+##  rstudioapi    0.13    2020-11-12 [1] CRAN (R 4.1.0)
+##  rvest         1.0.2   2021-10-16 [1] CRAN (R 4.1.0)
+##  s2            1.0.7   2021-09-28 [1] CRAN (R 4.1.0)
+##  sass          0.4.0   2021-05-12 [1] CRAN (R 4.1.0)
+##  scales        1.1.1   2020-05-11 [1] CRAN (R 4.1.0)
+##  servr         0.24    2021-11-16 [1] CRAN (R 4.1.2)
+##  sessioninfo   1.2.1   2021-11-02 [1] CRAN (R 4.1.0)
+##  sf            1.0-4   2021-11-14 [1] CRAN (R 4.1.0)
+##  sp            1.4-6   2021-11-14 [1] CRAN (R 4.1.0)
+##  stringi       1.7.6   2021-11-29 [1] CRAN (R 4.1.0)
+##  stringr     * 1.4.0   2019-02-10 [1] CRAN (R 4.1.0)
+##  testthat      3.1.0   2021-10-04 [1] CRAN (R 4.1.0)
+##  tibble      * 3.1.6   2021-11-07 [1] CRAN (R 4.1.0)
+##  tidyr       * 1.1.4   2021-09-27 [1] CRAN (R 4.1.0)
+##  tidyselect    1.1.1   2021-04-30 [1] CRAN (R 4.1.0)
+##  tidyverse   * 1.3.1   2021-04-15 [1] CRAN (R 4.1.0)
+##  tweenr        1.0.2   2021-03-23 [1] CRAN (R 4.1.0)
+##  tzdb          0.2.0   2021-10-27 [1] CRAN (R 4.1.0)
+##  units         0.7-2   2021-06-08 [1] CRAN (R 4.1.0)
+##  usethis       2.1.5   2021-12-09 [1] CRAN (R 4.1.0)
+##  utf8          1.2.2   2021-07-24 [1] CRAN (R 4.1.0)
+##  vctrs         0.3.8   2021-04-29 [1] CRAN (R 4.1.0)
+##  viridis     * 0.6.2   2021-10-13 [1] CRAN (R 4.1.0)
+##  viridisLite * 0.4.0   2021-04-13 [1] CRAN (R 4.1.0)
+##  withr         2.4.3   2021-11-30 [1] CRAN (R 4.1.0)
+##  wk            0.5.0   2021-07-13 [1] CRAN (R 4.1.0)
+##  xaringan      0.22    2021-06-23 [1] CRAN (R 4.1.0)
+##  xfun          0.29    2021-12-14 [1] CRAN (R 4.1.0)
+##  xml2          1.3.2   2020-04-23 [1] CRAN (R 4.1.0)
+##  yaml          2.2.2   2022-01-25 [1] CRAN (R 4.1.2)
+## 
+##  [1] /Library/Frameworks/R.framework/Versions/4.1/Resources/library
+## 
+## ─────────────────────────────────────────────────────────────────────────────────────────────────────
+```
+]
+
+
+These slides are licensed under &lt;br&gt;&lt;center&gt;&lt;a href="https://creativecommons.org/licenses/by-sa/3.0/au/"&gt;&lt;img src="images/cc.svg" style="height:2em;"/&gt;&lt;img src="images/by.svg" style="height:2em;"/&gt;&lt;img src="images/sa.svg" style="height:2em;"/&gt;&lt;/a&gt;&lt;/center&gt;
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLanguage": "r",
+"highlightLines": true,
+"highlightSpans": false,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%/%total%",
+"navigation": {
+"scroll": false,
+"touch": true,
+"click": false
+},
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'assets/mathjax-local/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

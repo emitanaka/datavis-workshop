@@ -1,0 +1,16 @@
+tidyverse
+ggthemes
+maps
+mapproj
+viridis
+ggmap
+DT
+leaflet
+lubridate
+plotly
+gapminder
+gganimate
+nullabor
+datasauRus
+here
+transformr
